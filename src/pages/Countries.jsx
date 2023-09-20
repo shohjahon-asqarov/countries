@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import axios from 'axios'
 
 import { populationFilter } from '../filter/populationFilter'
-import { Empty, Input, Select, Skeleton } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { Button, Empty, Input, Select, Skeleton, Tooltip } from 'antd';
+import { AudioOutlined, SearchOutlined } from '@ant-design/icons';
+
+import { useSpeechRecognition } from 'react-speech-kit';
 
 const Countries = () => {
     const [countries, setCountries] = useState([])
@@ -23,23 +25,37 @@ const Countries = () => {
         getCountries('https://restcountries.com/v3.1/all')
     }, [])
 
-
     const handleChange = (region) => {
         getCountries(`https://restcountries.com/v3.1/region/${region}`)
     };
 
     const found = countries.find(i => i.name.common.toLowerCase().includes(searchText))
 
+    const { listen, stop } = useSpeechRecognition({
+        onResult: (result) => {
+            setSearchText(result)
+        }
+    })
+
     return (
         <section>
             <div className="container py-10 flex flex-col sm:flex-row space-y-4 sm:space-y-0 justify-between items-center">
-                <Input
-                    placeholder="Search by region"
-                    size='large'
-                    onChange={(e) => setSearchText(e.target.value)}
-                    className='w-full sm:w-[300px] md:w-[400px] dark:placeholder:text-white'
-                    suffix={<SearchOutlined />}
-                />
+                <div className='space-x-5'>
+                    <Input
+                        placeholder="Search by region"
+                        size='large'
+                        onChange={(e) => setSearchText(e.target.value)}
+                        className='w-full sm:w-[300px] md:w-[400px] dark:placeholder:text-white'
+                        suffix={<SearchOutlined />}
+                        value={searchText}
+                        allowClear
+                    />
+
+                    <Tooltip onClick={listen} onMouseLeave={stop} className='bg-blue-600 text-white hover:!text-white' title={'search'}>
+                        <Button shape="circle" icon={<AudioOutlined />} />
+                    </Tooltip>
+
+                </div>
 
                 <Select
                     defaultValue="Filter by Region"
