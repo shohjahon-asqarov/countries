@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    @apply bg-white dark:bg-dark
+  }
+}
 @layer components {
   .container {
     @apply max-w-container mx-auto px-5;
